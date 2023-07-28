@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/df-mc/dragonfly/server"
 	"github.com/df-mc/dragonfly/server/item"
 	"github.com/df-mc/dragonfly/server/item/creative"
@@ -12,6 +13,7 @@ import (
 	"github.com/df-mc/dragonfly/server/world/sound"
 	"github.com/flonja/multiversion/packbuilder"
 	_ "github.com/flonja/multiversion/protocols" // VERY IMPORTANT
+	v419 "github.com/flonja/multiversion/protocols/v419"
 	v582 "github.com/flonja/multiversion/protocols/v582"
 	"github.com/sandertv/gophertunnel/minecraft"
 	"github.com/sirupsen/logrus"
@@ -34,9 +36,10 @@ func runServer() {
 		log.Fatalln(err)
 	}
 	pv582 := v582.New()
+	pv419 := v419.New()
 
 	resources := conf.Resources
-	if autoGen, ok := packbuilder.BuildResourcePack(world.CustomItems(), pv582.Ver()); ok && !conf.DisableResourceBuilding {
+	if autoGen, ok := packbuilder.BuildResourcePack(world.CustomItems(), pv419.Ver()); ok && !conf.DisableResourceBuilding {
 		resources = append(resources, autoGen)
 	}
 	conf.DisableResourceBuilding = true
@@ -50,7 +53,7 @@ func runServer() {
 				ResourcePacks:          resources,
 				Biomes:                 biomes(),
 				TexturePacksRequired:   conf.ResourcesRequired,
-				AcceptedProtocols:      []minecraft.Protocol{pv582},
+				AcceptedProtocols:      []minecraft.Protocol{pv582, pv419},
 			}
 			l, err := cfg.Listen("raknet", uc.Network.Address)
 			if err != nil {

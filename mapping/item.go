@@ -1,6 +1,8 @@
 package mapping
 
 import (
+	"encoding/json"
+
 	"github.com/sandertv/gophertunnel/minecraft/nbt"
 )
 
@@ -70,5 +72,67 @@ func (m *DefaultItemMapping) Air() int32 {
 }
 
 func (m *DefaultItemMapping) ItemVersion() uint16 {
+	return m.itemVersion
+}
+
+type LegacyItemMapping struct {
+	// itemRuntimeIDsToNames holds a map to translate item runtime IDs to string IDs.
+	itemRuntimeIDsToNames map[int32]string
+	// itemNamesToRuntimeIDs holds a map to translate item string IDs to runtime IDs.
+	itemNamesToRuntimeIDs map[string]int32
+	airRID                int32
+	itemVersion           uint16
+}
+
+func NewLegacyItemMapping(raw []byte, itemVersion uint16) *DefaultItemMapping {
+	itemRuntimeIDsToNames := make(map[int32]string)
+	itemNamesToRuntimeIDs := make(map[string]int32)
+	var airRID *int32
+
+	var items map[string]struct {
+		runtime_id      int32
+		component_based bool
+	}
+	if err := json.Unmarshal(raw, &items); err != nil {
+		panic(err)
+	}
+	for name, it := range items {
+		if name == "minecraft:air" {
+			airRID = &it.runtime_id
+		}
+
+		itemNamesToRuntimeIDs[name] = it.runtime_id
+		itemRuntimeIDsToNames[it.runtime_id] = name
+	}
+	if airRID == nil {
+		panic("couldn't find air")
+	}
+
+	return &DefaultItemMapping{itemRuntimeIDsToNames: itemRuntimeIDsToNames, itemNamesToRuntimeIDs: itemNamesToRuntimeIDs,
+		itemVersion: itemVersion}
+}
+
+func (m *LegacyItemMapping) ItemRuntimeIDToName(runtimeID int32) (name string, found bool) {
+	name, ok := m.itemRuntimeIDsToNames[runtimeID]
+	return name, ok
+}
+
+func (m *LegacyItemMapping) ItemNameToRuntimeID(name string) (runtimeID int32, found bool) {
+	rid, ok := m.itemNamesToRuntimeIDs[name]
+	return rid, ok
+}
+
+func (m *LegacyItemMapping) RegisterEntry(name string) int32 {
+	nextRID := int32(len(m.itemRuntimeIDsToNames))
+	m.itemNamesToRuntimeIDs[name] = nextRID
+	m.itemRuntimeIDsToNames[nextRID] = name
+	return nextRID
+}
+
+func (m *LegacyItemMapping) Air() int32 {
+	return m.airRID
+}
+
+func (m *LegacyItemMapping) ItemVersion() uint16 {
 	return m.itemVersion
 }

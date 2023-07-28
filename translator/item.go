@@ -2,6 +2,7 @@ package translator
 
 import (
 	"fmt"
+
 	"github.com/df-mc/dragonfly/server/world"
 	"github.com/flonja/multiversion/internal/item"
 	"github.com/flonja/multiversion/mapping"
@@ -276,6 +277,7 @@ func (t *DefaultItemTranslator) DowngradeItemPackets(pks []packet.Packet, _ *min
 		case *packet.AddPlayer:
 			pk.HeldItem = t.DowngradeItemInstance(pk.HeldItem)
 		case *packet.InventorySlot:
+			fmt.Println(pk.NewItem, t.DowngradeItemInstance(pk.NewItem))
 			pk.NewItem = t.DowngradeItemInstance(pk.NewItem)
 		case *packet.InventoryContent:
 			pk.Content = lo.Map(pk.Content, func(item protocol.ItemInstance, _ int) protocol.ItemInstance {

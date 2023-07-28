@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/df-mc/dragonfly/server"
 	"github.com/df-mc/dragonfly/server/item"
 	"github.com/df-mc/dragonfly/server/item/creative"
@@ -12,6 +13,7 @@ import (
 	"github.com/df-mc/dragonfly/server/world/sound"
 	"github.com/flonja/multiversion/packbuilder"
 	_ "github.com/flonja/multiversion/protocols" // VERY IMPORTANT
+	v419 "github.com/flonja/multiversion/protocols/v419"
 	v486 "github.com/flonja/multiversion/protocols/v486"
 	v582 "github.com/flonja/multiversion/protocols/v582"
 	v589 "github.com/flonja/multiversion/protocols/v589"
@@ -52,7 +54,7 @@ func runServer() {
 				ResourcePacks:          resources,
 				Biomes:                 biomes(),
 				TexturePacksRequired:   conf.ResourcesRequired,
-				AcceptedProtocols:      []minecraft.Protocol{pv486, v582.New(), v589.New()},
+				AcceptedProtocols:      []minecraft.Protocol{v419.New(), pv486, v582.New(), v589.New()},
 			}
 			l, err := cfg.Listen("raknet", uc.Network.Address)
 			if err != nil {

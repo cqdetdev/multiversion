@@ -66,6 +66,7 @@ func (Protocol) Packets(_ bool) packet.Pool {
 	pool[packet.IDCommandRequest] = func() packet.Packet { return &legacypacket.CommandRequest{} }
 	pool[packet.IDCraftingEvent] = func() packet.Packet { return &legacypacket.CraftingEvent{} }
 	pool[packet.IDInventoryTransaction] = func() packet.Packet { return &legacypacket.InventoryTransaction{} }
+	pool[packet.IDLevelChunk] = func() packet.Packet { return &legacypacket.LevelChunk{} }
 	pool[packet.IDItemStackRequest] = func() packet.Packet { return &legacypacket.ItemStackRequest{} }
 	pool[packet.IDMapInfoRequest] = func() packet.Packet { return &legacypacket.MapInfoRequest{} }
 	pool[packet.IDMobArmourEquipment] = func() packet.Packet { return &legacypacket.MobArmourEquipment{} }
@@ -455,6 +456,65 @@ func (p Protocol) ConvertFromLatest(pk packet.Packet, conn *minecraft.Conn) (res
 			result[i] = &legacypacket.HurtArmour{
 				Cause:  pk.Cause,
 				Damage: pk.Damage,
+			}
+
+		case *packet.MobArmourEquipment:
+			result[i] = &legacypacket.MobArmourEquipment{
+				EntityRuntimeID: pk.EntityRuntimeID,
+				Helmet: types.ItemStack{
+					ItemType: types.ItemType{
+						NetworkID:     pk.Helmet.Stack.NetworkID,
+						MetadataValue: int16(pk.Helmet.Stack.MetadataValue),
+					},
+					Count:         int16(pk.Helmet.Stack.Count),
+					NBTData:       pk.Helmet.Stack.NBTData,
+					CanBePlacedOn: pk.Helmet.Stack.CanBePlacedOn,
+					CanBreak:      pk.Helmet.Stack.CanBreak,
+				},
+				Chestplate: types.ItemStack{
+					ItemType: types.ItemType{
+						NetworkID:     pk.Chestplate.Stack.NetworkID,
+						MetadataValue: int16(pk.Chestplate.Stack.MetadataValue),
+					},
+					Count:         int16(pk.Chestplate.Stack.Count),
+					NBTData:       pk.Chestplate.Stack.NBTData,
+					CanBePlacedOn: pk.Chestplate.Stack.CanBePlacedOn,
+					CanBreak:      pk.Chestplate.Stack.CanBreak,
+				},
+				Leggings: types.ItemStack{
+					ItemType: types.ItemType{
+						NetworkID:     pk.Leggings.Stack.NetworkID,
+						MetadataValue: int16(pk.Leggings.Stack.MetadataValue),
+					},
+					Count:         int16(pk.Leggings.Stack.Count),
+					NBTData:       pk.Leggings.Stack.NBTData,
+					CanBePlacedOn: pk.Leggings.Stack.CanBePlacedOn,
+					CanBreak:      pk.Leggings.Stack.CanBreak,
+				},
+				Boots: types.ItemStack{
+					ItemType: types.ItemType{
+						NetworkID:     pk.Boots.Stack.NetworkID,
+						MetadataValue: int16(pk.Boots.Stack.MetadataValue),
+					},
+					Count:         int16(pk.Boots.Stack.Count),
+					NBTData:       pk.Boots.Stack.NBTData,
+					CanBePlacedOn: pk.Boots.Stack.CanBePlacedOn,
+					CanBreak:      pk.Boots.Stack.CanBreak,
+				},
+			}
+		case *packet.MobEquipment:
+			result[i] = &legacypacket.MobEquipment{
+				EntityRuntimeID: pk.EntityRuntimeID,
+				NewItem: types.ItemStack{
+					ItemType: types.ItemType{
+						NetworkID:     pk.NewItem.Stack.NetworkID,
+						MetadataValue: int16(pk.NewItem.Stack.MetadataValue),
+					},
+					Count:         int16(pk.NewItem.Stack.Count),
+					NBTData:       pk.NewItem.Stack.NBTData,
+					CanBePlacedOn: pk.NewItem.Stack.CanBePlacedOn,
+					CanBreak:      pk.NewItem.Stack.CanBreak,
+				},
 			}
 		case *packet.NetworkChunkPublisherUpdate:
 			result[i] = &legacypacket.NetworkChunkPublisherUpdate{

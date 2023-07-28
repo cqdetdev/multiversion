@@ -33,8 +33,8 @@ func (*MobArmourEquipment) ID() uint32 {
 // Marshal ...
 func (pk *MobArmourEquipment) Marshal(w protocol.IO) {
 	w.Varuint64(&pk.EntityRuntimeID)
-	types.WriteItem(w, &pk.Helmet)
-	types.WriteItem(w, &pk.Chestplate)
-	types.WriteItem(w, &pk.Leggings)
-	types.WriteItem(w, &pk.Boots)
+	pk.Helmet.Marshal(w)
+	pk.Chestplate.Marshal(w)
+	pk.Leggings.Marshal(w)
+	pk.Boots.Marshal(w)
 }

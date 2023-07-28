@@ -2,6 +2,8 @@ package translator
 
 import (
 	"bytes"
+	"fmt"
+
 	"github.com/df-mc/dragonfly/server/block/cube"
 	"github.com/df-mc/dragonfly/server/world"
 	"github.com/flonja/multiversion/internal/chunk"
@@ -164,14 +166,14 @@ func (t *DefaultBlockTranslator) DowngradeBlockPackets(pks []packet.Packet, conn
 
 				c, err := chunk.NetworkDecode(t.latest.Air(), buf, count, oldFormat, r)
 				if err != nil {
-					//fmt.Println(err)
+					fmt.Println(err)
 					break
 				}
 				t.DowngradeChunk(c, oldFormat)
 
 				payload, err := chunk.NetworkEncode(t.mapping.Air(), c, oldFormat)
 				if err != nil {
-					//fmt.Println(err)
+					fmt.Println(err)
 					break
 				}
 				writeBuf.Write(payload)
@@ -220,7 +222,7 @@ func (t *DefaultBlockTranslator) DowngradeBlockPackets(pks []packet.Packet, conn
 						ind := byte(i)
 						subChunk, err := chunk.DecodeSubChunk(t.latest.Air(), r, buf, &ind, chunk.NetworkEncoding)
 						if err != nil {
-							//fmt.Println(err)
+							fmt.Println(err)
 							continue
 						}
 						t.DowngradeSubChunk(subChunk)
@@ -343,14 +345,14 @@ func (t *DefaultBlockTranslator) UpgradeBlockPackets(pks []packet.Packet, conn *
 
 				c, err := chunk.NetworkDecode(t.mapping.Air(), buf, count, oldFormat, r)
 				if err != nil {
-					//fmt.Println(err)
+					fmt.Println(err)
 					break
 				}
 				t.UpgradeChunk(c, oldFormat)
 
 				payload, err := chunk.NetworkEncode(t.latest.Air(), c, oldFormat)
 				if err != nil {
-					//fmt.Println(err)
+					fmt.Println(err)
 					break
 				}
 				writeBuf.Write(payload)
@@ -435,7 +437,7 @@ func (t *DefaultBlockTranslator) UpgradeBlockPackets(pks []packet.Packet, conn *
 				ind := byte(0)
 				subChunk, err := chunk.DecodeSubChunk(t.mapping.Air(), r, buf, &ind, chunk.NetworkEncoding)
 				if err != nil {
-					//fmt.Println(err)
+					fmt.Println(err)
 					continue
 				}
 				t.UpgradeSubChunk(subChunk)

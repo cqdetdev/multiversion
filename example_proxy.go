@@ -3,15 +3,17 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"os"
+	"sync"
+
 	_ "github.com/flonja/multiversion/protocols" // VERY IMPORTANT
+	v419 "github.com/flonja/multiversion/protocols/v419"
 	v486 "github.com/flonja/multiversion/protocols/v486"
 	v582 "github.com/flonja/multiversion/protocols/v582"
 	v589 "github.com/flonja/multiversion/protocols/v589"
 	"github.com/sandertv/gophertunnel/minecraft"
 	"github.com/sandertv/gophertunnel/minecraft/auth"
 	"golang.org/x/oauth2"
-	"os"
-	"sync"
 )
 
 // The following program implements a proxy that forwards players from one local address to a remote address.
@@ -27,7 +29,7 @@ func runProxy(config config) {
 	}
 	listener, err := minecraft.ListenConfig{
 		StatusProvider:         p,
-		AcceptedProtocols:      []minecraft.Protocol{v486.New(), v582.New(), v589.New()},
+		AcceptedProtocols:      []minecraft.Protocol{v419.New(), v486.New(), v582.New(), v589.New()},
 		AuthenticationDisabled: !config.AuthEnabled,
 	}.Listen("raknet", config.Connection.LocalAddress)
 	if err != nil {
@@ -89,8 +91,97 @@ func handleConn(conn *minecraft.Conn, listener *minecraft.Listener, config confi
 	go func() {
 		defer serverConn.Close()
 		defer listener.Disconnect(conn, "connection lost")
+
+		//r := world.Overworld.Range()
+		//biomeBufferCache := make(map[protocol.ChunkPos][]byte)
+
 		for {
 			pk, err := serverConn.ReadPacket()
+
+			// switch pk := pk.(type) {
+			// case *packet.SubChunk:
+			// 	chunkBuf := bytes.NewBuffer(nil)
+			// 	blockEntities := make([]map[string]any, 0)
+			// 	for _, entry := range pk.SubChunkEntries {
+			// 		if entry.Result != protocol.SubChunkResultSuccess {
+			// 			chunkBuf.Write([]byte{
+			// 				chunk.SubChunkVersion,
+			// 				0, // The client will treat this as all air.
+			// 				uint8(entry.Offset[1]),
+			// 			})
+			// 			continue
+			// 		}
+
+			// 		var ind uint8
+			// 		readBuf := bytes.NewBuffer(entry.RawPayload)
+			// 		sub, err := chunk.DecodeSubChunk(latest.NewBlockMapping().Air(), r, readBuf, &ind, chunk.NetworkEncoding)
+			// 		if err != nil {
+			// 			fmt.Println(err)
+			// 			continue
+			// 		}
+
+			// 		var blockEntity map[string]any
+			// 		dec := nbt.NewDecoderWithEncoding(readBuf, nbt.NetworkLittleEndian)
+			// 		for {
+			// 			if err := dec.Decode(&blockEntity); err != nil {
+			// 				break
+			// 			}
+			// 			blockEntities = append(blockEntities, blockEntity)
+			// 		}
+
+			// 		chunkBuf.Write(chunk.EncodeSubChunk(sub, chunk.NetworkEncoding, chunk.SubChunkVersion9, r, int(ind)))
+			// 	}
+
+			// 	chunkPos := protocol.ChunkPos{pk.Position.X(), pk.Position.Z()}
+			// 	_, _ = chunkBuf.Write(append(biomeBufferCache[chunkPos], 0))
+			// 	delete(biomeBufferCache, chunkPos)
+
+			// 	enc := nbt.NewEncoderWithEncoding(chunkBuf, nbt.NetworkLittleEndian)
+			// 	for _, b := range blockEntities {
+			// 		_ = enc.Encode(b)
+			// 	}
+
+			// 	_ = conn.WritePacket(&packet.LevelChunk{
+			// 		Position:      chunkPos,
+			// 		SubChunkCount: uint32(len(pk.SubChunkEntries)),
+			// 		RawPayload:    append([]byte(nil), chunkBuf.Bytes()...),
+			// 	})
+			// 	_ = conn.Flush()
+			// 	continue
+			// case *packet.LevelChunk:
+			// 	if pk.SubChunkCount != protocol.SubChunkRequestModeLimitless && pk.SubChunkCount != protocol.SubChunkRequestModeLimited {
+			// 		// No changes to be made here.
+			// 		break
+			// 	}
+
+			// 	max := r.Height() >> 4
+			// 	if pk.SubChunkCount == protocol.SubChunkRequestModeLimited {
+			// 		max = int(pk.HighestSubChunk)
+			// 	}
+
+			// 	offsets := make([]protocol.SubChunkOffset, 0, max)
+			// 	for i := 0; i < max; i++ {
+			// 		offsets = append(offsets, protocol.SubChunkOffset{0, int8(i + (r[0] >> 4)), 0})
+			// 	}
+
+			// 	biomeBufferCache[pk.Position] = pk.RawPayload[:len(pk.RawPayload)-1]
+			// 	_ = serverConn.WritePacket(&packet.SubChunkRequest{
+			// 		Position: protocol.SubChunkPos{pk.Position.X(), 0, pk.Position.Z()},
+			// 		Offsets:  offsets,
+			// 	})
+			// 	_ = serverConn.Flush()
+			// 	continue
+			// 	// case *packet.Transfer:
+			// 	// 	a.remoteAddress = fmt.Sprintf("%s:%d", pk.Address, pk.Port)
+
+			// 	// 	pk.Address = "127.0.0.1"
+			// 	// 	pk.Port = a.localPort
+			// }
+			if err := conn.WritePacket(pk); err != nil {
+				return
+			}
+			_ = conn.Flush()
+
 			if err != nil {
 				if disconnect, ok := errors.Unwrap(err).(minecraft.DisconnectError); ok {
 					_ = listener.Disconnect(conn, disconnect.Error())

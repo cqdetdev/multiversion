@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/df-mc/dragonfly/server/item/category"
 	"image"
+
+	"github.com/df-mc/dragonfly/server/item/category"
 )
 
 // todo: remove after debugging
@@ -19,7 +20,7 @@ func (i testItem) Name() string {
 }
 
 func (i testItem) Texture() image.Image {
-	return image.NewGray(image.Rect(0, 0, 32, 32))
+	return image.NewRGBA(image.Rect(0, 0, 32, 32))
 }
 
 func (i testItem) Category() category.Category {

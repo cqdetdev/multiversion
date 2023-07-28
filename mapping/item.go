@@ -84,7 +84,7 @@ type LegacyItemMapping struct {
 	itemVersion           uint16
 }
 
-func NewLegacyItemMapping(raw []byte, itemVersion uint16) *DefaultItemMapping {
+func NewLegacyItemMapping(raw []byte, itemVersion uint16) *LegacyItemMapping {
 	itemRuntimeIDsToNames := make(map[int32]string)
 	itemNamesToRuntimeIDs := make(map[string]int32)
 	var airRID *int32
@@ -108,7 +108,7 @@ func NewLegacyItemMapping(raw []byte, itemVersion uint16) *DefaultItemMapping {
 		panic("couldn't find air")
 	}
 
-	return &DefaultItemMapping{itemRuntimeIDsToNames: itemRuntimeIDsToNames, itemNamesToRuntimeIDs: itemNamesToRuntimeIDs,
+	return &LegacyItemMapping{itemRuntimeIDsToNames: itemRuntimeIDsToNames, itemNamesToRuntimeIDs: itemNamesToRuntimeIDs,
 		itemVersion: itemVersion}
 }
 

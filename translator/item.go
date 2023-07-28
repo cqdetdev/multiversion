@@ -7,6 +7,7 @@ import (
 	"github.com/flonja/multiversion/internal/item"
 	"github.com/flonja/multiversion/mapping"
 	"github.com/flonja/multiversion/packbuilder"
+	"github.com/flonja/multiversion/protocols/v486/types"
 	"github.com/samber/lo"
 	"github.com/sandertv/gophertunnel/minecraft"
 	"github.com/sandertv/gophertunnel/minecraft/protocol"
@@ -152,6 +153,10 @@ func (t *DefaultItemTranslator) DowngradeItemDescriptor(input protocol.ItemDescr
 		if name, ok := t.mapping.ItemRuntimeIDToName(itemType.NetworkID); ok {
 			descriptor.Name = name
 		}
+		return descriptor
+	case *types.DefaultItemDescriptor:
+		itemType := t.DowngradeItemType(protocol.ItemType{NetworkID: int32(descriptor.NetworkID), MetadataValue: uint32(descriptor.MetadataValue)})
+		descriptor.NetworkID, descriptor.MetadataValue = (itemType.NetworkID), int32(itemType.MetadataValue)
 		return descriptor
 	}
 	panic("unknown item descriptor")

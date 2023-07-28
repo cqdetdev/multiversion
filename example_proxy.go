@@ -8,8 +8,6 @@ import (
 
 	_ "github.com/flonja/multiversion/protocols" // VERY IMPORTANT
 	v419 "github.com/flonja/multiversion/protocols/v419"
-	v486 "github.com/flonja/multiversion/protocols/v486"
-	v582 "github.com/flonja/multiversion/protocols/v582"
 	v589 "github.com/flonja/multiversion/protocols/v589"
 	"github.com/sandertv/gophertunnel/minecraft"
 	"github.com/sandertv/gophertunnel/minecraft/auth"
@@ -29,7 +27,7 @@ func runProxy(config config) {
 	}
 	listener, err := minecraft.ListenConfig{
 		StatusProvider:         p,
-		AcceptedProtocols:      []minecraft.Protocol{v419.New(), v486.New(), v582.New(), v589.New()},
+		AcceptedProtocols:      []minecraft.Protocol{v419.New(), v589.New()},
 		AuthenticationDisabled: !config.AuthEnabled,
 	}.Listen("raknet", config.Connection.LocalAddress)
 	if err != nil {
@@ -92,8 +90,8 @@ func handleConn(conn *minecraft.Conn, listener *minecraft.Listener, config confi
 		defer serverConn.Close()
 		defer listener.Disconnect(conn, "connection lost")
 
-		//r := world.Overworld.Range()
-		//biomeBufferCache := make(map[protocol.ChunkPos][]byte)
+		// r := world.Overworld.Range()
+		// biomeBufferCache := make(map[protocol.ChunkPos][]byte)
 
 		for {
 			pk, err := serverConn.ReadPacket()
@@ -176,7 +174,7 @@ func handleConn(conn *minecraft.Conn, listener *minecraft.Listener, config confi
 
 			// 	// 	pk.Address = "127.0.0.1"
 			// 	// 	pk.Port = a.localPort
-			// }
+			//}
 			if err := conn.WritePacket(pk); err != nil {
 				return
 			}

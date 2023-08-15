@@ -54,7 +54,10 @@ func (p Protocol) Ver() string {
 
 // Packets ...
 func (Protocol) Packets() packet.Pool {
-	pool := packet.NewPool()
+	pool := packet.NewClientPool()
+	for _, pk := range packet.NewServerPool() {
+		pool.
+	}
 	pool[packet.IDActorPickRequest] = func() packet.Packet { return &legacypacket.ActorPickRequest{} }
 	pool[packet.IDCommandRequest] = func() packet.Packet { return &legacypacket.CommandRequest{} }
 	pool[packet.IDCraftingEvent] = func() packet.Packet { return &legacypacket.CraftingEvent{} }
@@ -84,8 +87,8 @@ func (Protocol) Encryption(key [32]byte) packet.Encryption {
 func (p Protocol) NewReader(r interface {
 	io.Reader
 	io.ByteReader
-}, shieldID int32) protocol.IO {
-	return NewReader(protocol.NewReader(r, shieldID))
+}, shieldID int32, enableLimits bool) protocol.IO {
+	return NewReader(protocol.NewReader(r, shieldID, enableLimits))
 }
 
 func (p Protocol) NewWriter(w interface {
@@ -252,9 +255,9 @@ func (p Protocol) ConvertFromLatest(pk packet.Packet, conn *minecraft.Conn) (res
 		fmt.Printf("1.20.x -> 1.16.100: %T\n", pk)
 		switch pk := pk.(type) {
 		case *packet.ActorEvent:
-			if pk.EventType > packet.ActorEventFinishedChargingCrossbow {
-				return nil
-			}
+			// if pk.EventType > packet.ActorEvent {
+			// 	return nil
+			// }
 		case *packet.AddActor:
 			result[i] = &legacypacket.AddActor{
 				EntityUniqueID:  pk.EntityUniqueID,
@@ -315,7 +318,7 @@ func (p Protocol) ConvertFromLatest(pk packet.Packet, conn *minecraft.Conn) (res
 						Description:     c.Description,
 						Flags:           byte(c.Flags),
 						PermissionLevel: c.PermissionLevel,
-						Aliases:         c.Aliases,
+						//Aliases:         c.AliasesOffset,
 						Overloads: lo.Map(c.Overloads, func(o protocol.CommandOverload, i int) types.CommandOverload {
 							return types.CommandOverload{Parameters: lo.Map(o.Parameters, func(p protocol.CommandParameter, _ int) types.CommandParameter {
 								return types.CommandParameter{
@@ -323,8 +326,8 @@ func (p Protocol) ConvertFromLatest(pk packet.Packet, conn *minecraft.Conn) (res
 									Type:                types.DowngradeParamType(p.Type),
 									Optional:            p.Optional,
 									CollapseEnumOptions: true,
-									Enum:                types.CommandEnum(p.Enum),
-									Suffix:              p.Suffix,
+									//Enum:                types.CommandEnum(p.Enum),
+									//Suffix:              p.Suffix,
 								}
 							})}
 						}),

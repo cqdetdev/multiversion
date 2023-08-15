@@ -4,13 +4,12 @@ import (
 	"fmt"
 
 	"github.com/df-mc/dragonfly/server"
+	"github.com/df-mc/dragonfly/server/block"
 	"github.com/df-mc/dragonfly/server/item"
-	"github.com/df-mc/dragonfly/server/item/creative"
 	"github.com/df-mc/dragonfly/server/player"
 	"github.com/df-mc/dragonfly/server/player/chat"
 	"github.com/df-mc/dragonfly/server/session"
 	"github.com/df-mc/dragonfly/server/world"
-	"github.com/df-mc/dragonfly/server/world/sound"
 	"github.com/flonja/multiversion/packbuilder"
 	_ "github.com/flonja/multiversion/protocols" // VERY IMPORTANT
 	v419 "github.com/flonja/multiversion/protocols/v419"
@@ -25,10 +24,6 @@ func runServer() {
 	log.Level = logrus.DebugLevel
 
 	chat.Global.Subscribe(chat.StdoutSubscriber{})
-
-	i := testItem{}
-	world.RegisterItem(i)
-	creative.RegisterItem(item.NewStack(i, 1))
 
 	uc := server.DefaultConfig()
 	conf, err := uc.Config(log)
@@ -73,9 +68,7 @@ func runServer() {
 	for srv.Accept(func(p *player.Player) {
 		p.ShowCoordinates()
 		p.SetGameMode(world.GameModeCreative)
-		p.Inventory().Clear()
-		_, _ = p.Inventory().AddItem(item.NewStack(item.MusicDisc{DiscType: sound.DiscRelic()}, 1))
-		_, _ = p.Inventory().AddItem(item.NewStack(i, 1))
+		p.Inventory().SetItem(1, item.NewStack(block.Air{}, 1))
 	}) {
 	}
 }

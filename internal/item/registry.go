@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"embed"
 	"encoding/json"
-	"github.com/df-mc/worldupgrader/blockupgrader"
-	"github.com/sandertv/gophertunnel/minecraft/nbt"
-	"github.com/sandertv/gophertunnel/minecraft/protocol"
 	"regexp"
 	"sort"
 	"strconv"
+
+	"github.com/df-mc/worldupgrader/blockupgrader"
+	"github.com/sandertv/gophertunnel/minecraft/nbt"
+	"github.com/sandertv/gophertunnel/minecraft/protocol"
 )
 
 var (
@@ -81,7 +82,7 @@ func init() {
 	}
 
 	blockStateMap = make(map[stateHash]blockupgrader.BlockState)
-	buf := protocol.NewReader(bytes.NewBuffer(rawblockStateMap), 0)
+	buf := protocol.NewReader(bytes.NewBuffer(rawblockStateMap), 0, true)
 	var length uint32
 	buf.Varuint32(&length)
 	for i := uint32(0); i < length; i++ {

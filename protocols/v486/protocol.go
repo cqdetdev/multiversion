@@ -3,6 +3,8 @@ package v486
 import (
 	_ "embed"
 	"encoding/json"
+	"io"
+
 	"github.com/flonja/multiversion/mapping"
 	"github.com/flonja/multiversion/protocols/latest"
 	legacypacket "github.com/flonja/multiversion/protocols/v486/packet"
@@ -12,7 +14,6 @@ import (
 	"github.com/sandertv/gophertunnel/minecraft"
 	"github.com/sandertv/gophertunnel/minecraft/protocol"
 	"github.com/sandertv/gophertunnel/minecraft/protocol/packet"
-	"io"
 )
 
 var (
@@ -78,8 +79,8 @@ func (p Protocol) Encryption(key [32]byte) packet.Encryption {
 func (p Protocol) NewReader(r interface {
 	io.Reader
 	io.ByteReader
-}, shieldID int32) protocol.IO {
-	return NewReader(protocol.NewReader(r, shieldID))
+}, shieldID int32, enableLimits bool) protocol.IO {
+	return NewReader(protocol.NewReader(r, shieldID, enableLimits))
 }
 
 func (p Protocol) NewWriter(w interface {

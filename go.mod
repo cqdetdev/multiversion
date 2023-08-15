@@ -10,10 +10,11 @@ require (
 	github.com/rogpeppe/go-internal v1.10.0
 	github.com/samber/lo v1.38.1
 	github.com/sandertv/go-raknet v1.12.0
-	github.com/sandertv/gophertunnel v1.30.0
+	github.com/sandertv/gophertunnel v1.31.0
 	github.com/sirupsen/logrus v1.9.3
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
 	golang.org/x/image v0.7.0
+	golang.org/x/oauth2 v0.8.0
 )
 
 require (
@@ -28,7 +29,6 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	golang.org/x/crypto v0.9.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
-	golang.org/x/oauth2 v0.8.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
@@ -38,4 +38,4 @@ require (
 
 replace github.com/sandertv/go-raknet => github.com/tedacmc/tedac-raknet v0.0.4
 
-replace github.com/sandertv/gophertunnel => github.com/flonja/tedac-gophertunnel v0.0.6
+replace github.com/sandertv/gophertunnel => github.com/everblademc/tedac-gophertunnel v0.0.9

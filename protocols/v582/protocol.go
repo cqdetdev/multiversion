@@ -2,6 +2,8 @@ package v582
 
 import (
 	_ "embed"
+	"io"
+
 	"github.com/flonja/multiversion/mapping"
 	"github.com/flonja/multiversion/packbuilder"
 	"github.com/flonja/multiversion/protocols/latest"
@@ -13,7 +15,6 @@ import (
 	"github.com/sandertv/gophertunnel/minecraft/protocol/packet"
 	"github.com/sandertv/gophertunnel/minecraft/resource"
 	"golang.org/x/exp/maps"
-	"io"
 )
 
 var (
@@ -33,8 +34,8 @@ type Protocol struct {
 func (p Protocol) NewReader(r interface {
 	io.Reader
 	io.ByteReader
-}, shieldID int32) protocol.IO {
-	return protocol.NewReader(r, shieldID)
+}, shieldID int32, enableLimits bool) protocol.IO {
+	return protocol.NewReader(r, shieldID, enableLimits)
 }
 
 func (p Protocol) NewWriter(w interface {

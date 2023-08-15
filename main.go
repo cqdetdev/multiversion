@@ -1,9 +1,9 @@
 package main
 
 func main() {
-	runProxy(config{Connection: struct {
-		LocalAddress  string
-		RemoteAddress string
-	}{LocalAddress: "0.0.0.0:19132", RemoteAddress: "127.0.0.1:19134"}, AuthEnabled: false})
+	// runProxy(config{Connection: struct {
+	// 	LocalAddress  string
+	// 	RemoteAddress string
+	// }{LocalAddress: "0.0.0.0:19132", RemoteAddress: "zeqa.net:19132"}, AuthEnabled: false})
 	runServer()
 }
